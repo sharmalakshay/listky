@@ -117,7 +117,10 @@ def check_rate_limit(username: str, db) -> bool:
     return (now - last_fail) > timedelta(minutes=lockout_minutes)
 
 @app.get("/", response_class=HTMLResponse)
-async def home(db = Depends(get_db)):
+async def home(request: Request, db = Depends(get_db)):
+    # Check if user is logged in
+    current_user = get_session_user(request)
+    
     # Get trending lists
     cursor = db.cursor()
     cursor.execute("""
@@ -138,6 +141,25 @@ async def home(db = Depends(get_db)):
             trending_html += f'<li><a href="/{username}/{slug}">{title}</a> by <a href="/{username}">{username}</a> ({views} views)</li>'
         trending_html += "</ul>"
     
+    # Show different buttons based on login status
+    if current_user:
+        actions_html = f"""
+            <div class="actions">
+                <a href="/{current_user}">👤 My Profile</a>
+                <a href="/{current_user}/create">📝 Create List</a>
+                <a href="/{current_user}/manage">⚙️ Manage Lists</a>
+                <a href="/logout">🚪 Log Out</a>
+            </div>
+            """
+        welcome_html = f'<p class="welcome">Welcome back, <strong>{current_user}</strong>!</p>'
+    else:
+        actions_html = """
+            <div class="actions">
+                <a href="/signup">Sign Up</a>
+                <a href="/login">Log In</a>
+            </div>
+            """
+        welcome_html = ""
     return f"""
     <html>
         <head>
@@ -147,6 +169,7 @@ async def home(db = Depends(get_db)):
                 body {{ font-family: system-ui, -apple-system, sans-serif; padding: 20px; max-width: 700px; margin: 0 auto; line-height: 1.5; }}
                 h1 {{ margin-bottom: 0.5rem; }}
                 .tagline {{ color: #666; margin-bottom: 2rem; }}
+                .welcome {{ background: #e8f4fd; padding: 1rem; border-radius: 4px; margin: 1rem 0; border-left: 4px solid #007acc; color: #0066aa; }}
                 .actions {{ margin: 2rem 0; }}
                 .actions a {{ display: inline-block; margin-right: 1rem; margin-bottom: 0.5rem; padding: 0.5rem 1rem; background: #007acc; color: white; text-decoration: none; border-radius: 4px; }}
                 .actions a:hover {{ background: #005c99; }}
@@ -160,10 +183,8 @@ async def home(db = Depends(get_db)):
             <p class="tagline"><strong>One word. One PIN. Zero bullshit.</strong></p>
             <p>The dumbest, most private, minimalist list-sharing platform on the internet.</p>
             
-            <div class="actions">
-                <a href="/signup">Sign Up</a>
-                <a href="/login">Log In</a>
-            </div>
+            {welcome_html}
+            {actions_html}
             
             {trending_html}
             
