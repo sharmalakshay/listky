@@ -13,7 +13,6 @@ venv.bak/
 
 # Data & secrets
 .env
-.env.*
 *.db
 *.sqlite3
 data/
