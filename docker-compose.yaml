@@ -1,0 +1,14 @@
+version: '3.8'
+
+services:
+  web:
+    image: lakkyme/listky:latest
+    container_name: listky-web
+    restart: always
+    ports:
+      - "8001:8000"                       # change host port if 8001 is taken
+    volumes:
+      - ${PROJECT_LOCATION}/data:/app/data
+    environment:
+      - PYTHONUNBUFFERED=1                # better logs
+      - APP_ENV=development
