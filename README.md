@@ -17,18 +17,18 @@ https://listky.top
 Modern platforms force you to give email, phone, OAuth, birthday, blood type, mother's maiden name, favorite color, and soul just to make a list of movies.  
 listky.top is the opposite: maximum identity with minimum data.  
 One word claims your namespace forever (first-come-first-served).  
-One PIN is your only key — lose it and the account is gone forever.
+One PIN is your only key - lose it and the account is gone forever.
 
 It's deliberately stupid and brutally honest about privacy.
 
 ## Core principles
 
-- **Zero personal data collected** — no email, no name, no phone, no IP stored in plain text (only salted SHA-256 hashes for abuse detection)
-- **No account recovery** — if you forget your PIN, your account is lost. We warned you.
-- **No tracking** — no Google Analytics, no Meta pixel, no fingerprinting libraries
-- **Minimal surface area** — plain text + links only (no image uploads, no rich embeds at v1)
-- **Self-hostable first** — the public instance is just one possible deployment
-- **AGPL-3.0 licensed** — if someone hosts a public version with changes, they must share the source
+- **Zero personal data collected** - no email, no name, no phone, no IP stored in plain text (only salted SHA-256 hashes for abuse detection)
+- **No account recovery** - if you forget your PIN, your account is lost. We warned you.
+- **No tracking** - no Google Analytics, no Meta pixel, no fingerprinting libraries
+- **Minimal surface area** - plain text + links only (no image uploads, no rich embeds at v1)
+- **Self-hostable first** - the public instance is just one possible deployment
+- **AGPL-3.0 licensed** - if someone hosts a public version with changes, they must share the source
 
 ## Features (v1 – MVP)
 
@@ -55,12 +55,12 @@ It's deliberately stupid and brutally honest about privacy.
 
 ## Privacy & Security Design
 
-- **No PII stored** — only username, hashed PIN, salted/hashed last IP, timestamps
-- **IP hashing** — SHA-256 + per-install salt (from .env) — not reversible, but enough for rate limiting & view deduplication
-- **Lockouts** — 4 fails → 5 min, then 15 min, then longer (stored in DB)
-- **No sessions/JWT** — every action requires PIN (stateless, no cookies at v1)
-- **Data stored** — SQLite single file (`/app/data/listky.db`) — easy backups
-- **No HTTPS inside Docker** — Cloudflare Tunnel handles TLS termination
+- **No PII stored** - only username, hashed PIN, salted/hashed last IP, timestamps
+- **IP hashing** - SHA-256 + per-install salt (from .env) - not reversible, but enough for rate limiting & view deduplication
+- **Lockouts** - 4 fails → 5 min, then 15 min, then longer (stored in DB)
+- **No sessions/JWT** - every action requires PIN (stateless, no cookies at v1)
+- **Data stored** - SQLite single file (`/app/data/listky.db`) - easy backups
+- **No HTTPS inside Docker** - Cloudflare Tunnel handles TLS termination
 
 **You have been warned:**  
 This is not a bank vault. If someone shoulder-surfs your PIN or you type it on a compromised device, your account is compromised. There is no reset button.

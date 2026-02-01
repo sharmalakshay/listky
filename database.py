@@ -4,7 +4,7 @@ from contextlib import contextmanager
 DATABASE = "/app/data/listky.db"
 
 def init_db():
-    with sqlite3.connect(DATABASE) as conn:
+    with sqlite3.connect(DATABASE, check_same_thread=False) as conn:
         c = conn.cursor()
         c.execute('''CREATE TABLE IF NOT EXISTS users (
             username TEXT PRIMARY KEY,
@@ -35,8 +35,16 @@ def init_db():
         conn.commit()
 
 @contextmanager
+def get_db_context():
+    conn = sqlite3.connect(DATABASE, check_same_thread=False)
+    try:
+        yield conn
+    finally:
+        conn.close()
+
 def get_db():
-    conn = sqlite3.connect(DATABASE)
+    """FastAPI dependency to get database connection"""
+    conn = sqlite3.connect(DATABASE, check_same_thread=False)
     try:
         yield conn
     finally:
