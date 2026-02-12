@@ -1,16 +1,4 @@
 // Simple Rich Text Editor - Clean Integration with Existing Forms
-console.log('CLEAN-EDITOR.JS LOADED - VERSION 2');
-
-// Test the conversion function immediately
-console.log('TESTING convertToMarkdown function...');
-const testHTML = '<ul><li>Normal item</li><li>Item with <strong>bold text</strong></li><li>Item with <em>italic text</em></li></ul>';
-setTimeout(() => {
-    if (typeof convertToMarkdown === 'function') {
-        const testResult = convertToMarkdown(testHTML);
-        console.log('Test HTML:', testHTML);
-        console.log('Test Result:', testResult);
-    }
-}, 1000);
 
 document.addEventListener('DOMContentLoaded', function() {
     // Convert textareas to rich text editors
@@ -24,14 +12,13 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Format existing list content for viewing
     const listContentElements = document.querySelectorAll('.list-content');
-    console.log('Found list content elements:', listContentElements.length); // Debug
     listContentElements.forEach(element => {
-        console.log('Processing element:', element); // Debug
         formatContentForDisplay(element);
     });
 });
 
 function createSimpleRichEditor(textarea) {
+    
     // Create wrapper
     const wrapper = document.createElement('div');
     wrapper.className = 'rich-editor-wrapper';
@@ -58,7 +45,7 @@ function createSimpleRichEditor(textarea) {
     richArea.contentEditable = true;
     richArea.innerHTML = convertToRichText(textarea.value);
     
-    // Style the wrapper to match form textarea
+    // Style the components
     wrapper.style.cssText = `
         border: 1px solid var(--border-color, #ddd);
         border-radius: 8px;
@@ -84,51 +71,49 @@ function createSimpleRichEditor(textarea) {
         line-height: 1.5;
     `;
     
-    // Add styles for toolbar buttons
-    const btnStyle = `
-        .rich-btn {
-            padding: 4px 8px !important;
-            border: 1px solid #ccc !important;
-            background: white !important;
-            border-radius: 4px !important;
-            cursor: pointer !important;
-            font-size: 14px !important;
-            transition: all 0.2s !important;
-        }
-        .rich-btn:hover {
-            background: #007bff !important;
-            color: white !important;
-        }
-        .rich-divider {
-            color: #ccc;
-            margin: 0 4px;
-        }
-        .rich-area ul {
-            list-style: none !important;
-            padding-left: 0 !important;
-        }
-        .rich-area li {
-            background: #f8f9fa !important;
-            margin: 4px 0 !important;
-            padding: 8px !important;
-            border-left: 3px solid #007bff !important;
-            border-radius: 4px !important;
-        }
-        .rich-area li:before {
-            content: "• ";
-            color: #007bff;
-            font-weight: bold;
-        }
-    `;
-    
+    // Add button styles
     if (!document.getElementById('rich-editor-styles')) {
         const style = document.createElement('style');
         style.id = 'rich-editor-styles';
-        style.textContent = btnStyle;
+        style.textContent = `
+            .rich-btn {
+                padding: 4px 8px !important;
+                border: 1px solid #ccc !important;
+                background: white !important;
+                border-radius: 4px !important;
+                cursor: pointer !important;
+                font-size: 14px !important;
+                transition: all 0.2s !important;
+            }
+            .rich-btn:hover {
+                background: #007bff !important;
+                color: white !important;
+            }
+            .rich-divider {
+                color: #ccc;
+                margin: 0 4px;
+            }
+            .rich-area ul {
+                list-style: none !important;
+                padding-left: 0 !important;
+            }
+            .rich-area li {
+                background: #f8f9fa !important;
+                margin: 4px 0 !important;
+                padding: 8px !important;
+                border-left: 3px solid #007bff !important;
+                border-radius: 4px !important;
+            }
+            .rich-area li:before {
+                content: "• ";
+                color: #007bff;
+                font-weight: bold;
+            }
+        `;
         document.head.appendChild(style);
     }
     
-    // Assemble
+    // Assemble wrapper
     wrapper.appendChild(toolbar);
     wrapper.appendChild(richArea);
     
@@ -163,21 +148,12 @@ function createSimpleRichEditor(textarea) {
     // Sync on form submit
     const form = textarea.closest('form');
     if (form) {
-        form.addEventListener('submit', function(e) {
-            console.log('FORM SUBMIT - Before updateTextarea');
-            console.log('richArea.innerHTML:', richArea.innerHTML);
-            updateTextarea();
-            console.log('textarea.value after update:', textarea.value);
-        });
+        form.addEventListener('submit', updateTextarea);
     }
     
     function updateTextarea() {
-        console.log('updateTextarea called');
-        console.log('richArea.innerHTML:', richArea.innerHTML);
         const content = convertToMarkdown(richArea.innerHTML);
-        console.log('convertToMarkdown result:', content);
         textarea.value = content;
-        console.log('textarea.value set to:', textarea.value);
     }
     
     function addNewListItem(area) {
@@ -237,8 +213,6 @@ function convertToRichText(markdown) {
 }
 
 function convertToMarkdown(html) {
-    console.log('convertToMarkdown called with HTML:', html);
-    
     // Create temp element
     const temp = document.createElement('div');
     temp.innerHTML = html;
@@ -246,94 +220,68 @@ function convertToMarkdown(html) {
     // Get list items
     const listItems = temp.querySelectorAll('li');
     if (listItems.length > 0) {
-        console.log('Found', listItems.length, 'list items');
         const result = Array.from(listItems).map(li => {
-            console.log('Processing li innerHTML:', li.innerHTML);
             
-            // Create a copy of the li element to manipulate
-            const liCopy = li.cloneNode(true);
+            let text = li.innerHTML;
             
             // Convert formatting to markdown BEFORE stripping other HTML
-            let text = liCopy.innerHTML;
-            
-            // Convert strong tags to markdown
             text = text.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
-            
-            // Convert em tags to markdown  
             text = text.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
-            
-            // Convert i tags to markdown
             text = text.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
-            
-            // Convert b tags to markdown
             text = text.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
             
             // Now strip remaining HTML tags
             text = text.replace(/<[^>]*>/g, '');
-            
-            // Clean up whitespace
             text = text.trim();
             
-            console.log('Final processed li text:', text);
             return `• ${text}`;
         }).join('\n');
-        console.log('Final list result:', result);
         return result;
     }
     
     // Handle paragraphs
     const paragraphs = temp.querySelectorAll('p');
     if (paragraphs.length > 0) {
-        console.log('Found', paragraphs.length, 'paragraphs');
         const result = Array.from(paragraphs).map(p => {
-            console.log('Processing p innerHTML:', p.innerHTML);
             
             let text = p.innerHTML;
-            
-            // Convert formatting to markdown BEFORE stripping other HTML
             text = text.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
             text = text.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
             text = text.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
             text = text.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
-            
-            // Now strip remaining HTML tags
             text = text.replace(/<[^>]*>/g, '');
-            
-            // Clean up whitespace
             text = text.trim();
             
-            console.log('Final processed p text:', text);
             return text;
         }).join('\n');
-        console.log('Final paragraph result:', result);
         return result;
     }
     
-    // Fallback - process the entire content
-    console.log('Fallback: processing entire content');
+    // Fallback
     let text = temp.innerHTML;
-    
-    // Convert formatting to markdown
     text = text.replace(/<strong[^>]*>(.*?)<\/strong>/gi, '**$1**');
     text = text.replace(/<em[^>]*>(.*?)<\/em>/gi, '*$1*');
     text = text.replace(/<i[^>]*>(.*?)<\/i>/gi, '*$1*');
     text = text.replace(/<b[^>]*>(.*?)<\/b>/gi, '**$1**');
-    
-    // Strip remaining HTML
     text = text.replace(/<[^>]*>/g, '');
     
-    console.log('Fallback result:', text);
     return text.trim();
 }
-function convertMarkdownToHTML(text) {
-    console.log('convertMarkdownToHTML called with:', text); // Debug
+
+function formatContentForDisplay(element) {
+    const content = element.textContent || '';
+    if (!content.trim()) return;
     
-    if (!text || text.trim() === '') return '';
+    // Convert markdown-style formatting to HTML for display
+    const formatted = convertMarkdownToHTML(content);
     
-    // Simple test - if we see **test** anywhere, make it bold
-    if (text.includes('**')) {
-        console.log('Found ** in text, processing...'); // Debug
+    if (formatted && formatted !== content) {
+        element.innerHTML = formatted;
     }
+}
+
+function convertMarkdownToHTML(text) {
+    if (!text || text.trim() === '') return '';
     
     const lines = text.split('\n')
         .map(line => line.trim())
@@ -342,13 +290,12 @@ function convertMarkdownToHTML(text) {
     if (lines.length === 0) return '';
     
     if (lines.length === 1) {
-        // Single line - just format it as a paragraph
+        // Single line
         const formatted = lines[0]
             .replace(/^[•\-\*]\s*/, '')
             .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
             .replace(/\*([^*]+)\*/g, '<em>$1</em>')
             .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
-        console.log('Single line formatted:', formatted); // Debug
         return `<p>${formatted}</p>`;
     } else {
         // Multiple lines - create list
@@ -362,23 +309,6 @@ function convertMarkdownToHTML(text) {
         }).join('');
         
         const result = `<ul>${items}</ul>`;
-        console.log('Multi-line formatted:', result); // Debug
         return result;
-    }
-}
-
-function formatContentForDisplay(element) {
-    const content = element.textContent || '';
-    if (!content.trim()) return;
-    
-    console.log('Raw content from element:', content); // Debug log
-    
-    // Convert markdown-style formatting to HTML for display
-    const formatted = convertMarkdownToHTML(content);
-    console.log('Formatted HTML result:', formatted); // Debug log
-    
-    if (formatted && formatted !== content) {
-        element.innerHTML = formatted;
-        console.log('Updated element HTML'); // Debug log
     }
 }

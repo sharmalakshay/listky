@@ -268,7 +268,7 @@ async def update_list_handler(username: str, slug: str, request: Request,
     current_user = get_session_user(request)
     if not current_user or current_user.lower() != username.lower():
         raise HTTPException(status_code=403, detail="Access denied")
-    
+
     try:
         result = update_list(username, slug, title, content, is_public, db)
         return RedirectResponse(url=f"/{username}/{slug}", status_code=303)
