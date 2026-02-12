@@ -681,17 +681,18 @@ ul {
     font-style: italic;
 }
 
-/* Simple list fallback */
+/* List content rendering - no double bullets */
 .list-content {
     line-height: 1.8;
 }
 
-.list-content ul {
-    list-style: none;
-    padding: 0;
+.list-content .formatted-list {
+    list-style: none !important;
+    padding: 0 !important;
+    margin: 0;
 }
 
-.list-content ul li {
+.list-content .formatted-list li {
     background: var(--white);
     padding: var(--spacing-md);
     margin: var(--spacing-sm) 0;

@@ -31,37 +31,13 @@
             </div>
             
             <div class="form-group">
-                <label class="form-label">List Items</label>
-                <div id="list-editor" class="list-editor">
-                    <div class="editor-toolbar">
-                        <button type="button" class="toolbar-btn" onclick="formatText('bold')" title="Bold">
-                            <strong>B</strong>
-                        </button>
-                        <button type="button" class="toolbar-btn" onclick="formatText('italic')" title="Italic">
-                            <em>I</em>
-                        </button>
-                        <div class="toolbar-divider"></div>
-                        <select id="text-color" class="toolbar-select" onchange="changeTextColor(this.value)">
-                            <option value="#333">Default</option>
-                            <option value="#e74c3c" style="color: #e74c3c;">Red</option>
-                            <option value="#3498db" style="color: #3498db;">Blue</option>
-                            <option value="#27ae60" style="color: #27ae60;">Green</option>
-                            <option value="#f39c12" style="color: #f39c12;">Orange</option>
-                            <option value="#9b59b6" style="color: #9b59b6;">Purple</option>
-                        </select>
-                        <div class="toolbar-divider"></div>
-                        <button type="button" class="toolbar-btn" onclick="addListItem()" title="Add Item">
-                            ➕ Add Item
-                        </button>
-                    </div>
-                    
-                    <div id="list-items" class="list-items">
-                        <!-- Items will be loaded here -->
-                    </div>
-                    
-                    <textarea id="content" name="content" required style="display: none;">{{ content or list.content }}</textarea>
-                </div>
-                <small class="form-help">Drag items to reorder. Use the toolbar for formatting. URLs will automatically become clickable links.</small>
+                <label for="content" class="form-label">List Content</label>
+                <textarea id="content" name="content" required 
+                          rows="10" 
+                          maxlength="10000"
+                          placeholder="• Item 1&#10;• Item 2&#10;• Check out https://example.com&#10;• Item 4"
+                          class="form-textarea">{{ content or list.content }}</textarea>
+                <small class="form-help">The rich text editor will load automatically. URLs will become clickable links.</small>
             </div>
             
             <div class="form-group">
@@ -85,17 +61,5 @@
     </div>
 </div>
 
-<script src="/static/list-editor.js"></script>
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Initialize the list editor with existing content
-    const existingContent = document.getElementById('content').value;
-    loadExistingContent(existingContent);
-    
-    // Update hidden textarea when form is submitted
-    document.getElementById('edit-list-form').addEventListener('submit', function() {
-        syncListToTextarea();
-    });
-});
-</script>
+<script src="/static/simple-editor.js"></script>
 {% endblock %}

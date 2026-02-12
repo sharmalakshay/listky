@@ -3,7 +3,7 @@
 {% block title %}Create List - {{ username }} - listky.top{% endblock %}
 
 {% block extra_head %}
-<script src="{{ url_for('static', path='/list-editor.js') }}" defer></script>
+<script src="{{ url_for('static', path='/simple-editor.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -40,8 +40,8 @@
         <textarea id="content" name="content" required 
                   rows="10" 
                   maxlength="10000"
-                  placeholder="Enter your list items here...">{{ content or '' }}</textarea>
-        <small>Use the interactive editor above to manage your list items with rich formatting!</small>
+                  placeholder="• Item 1&#10;• Item 2&#10;• Item 3">{{ content or '' }}</textarea>
+        <small>The rich text editor will load automatically. URLs will become clickable links.</small>
     </div>
     
     <div class="form-group">
