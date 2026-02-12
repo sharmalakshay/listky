@@ -12,7 +12,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // Format existing list content for viewing
     const listContentElements = document.querySelectorAll('.list-content');
+    console.log('Found list content elements:', listContentElements.length); // Debug
     listContentElements.forEach(element => {
+        console.log('Processing element:', element); // Debug
         formatContentForDisplay(element);
     });
 });
@@ -153,8 +155,12 @@ function createSimpleRichEditor(textarea) {
     }
     
     function updateTextarea() {
+        console.log('updateTextarea called');
+        console.log('richArea.innerHTML:', richArea.innerHTML);
         const content = convertToMarkdown(richArea.innerHTML);
+        console.log('convertToMarkdown result:', content);
         textarea.value = content;
+        console.log('textarea.value set to:', textarea.value);
     }
     
     function addNewListItem(area) {
@@ -212,8 +218,24 @@ function convertToRichText(markdown) {
         return `<ul>${items}</ul>`;
     }
 }
+    } else {
+        // Multiple lines - create list
+        const items = lines.map(line => {
+            const cleaned = line.replace(/^[•\-\*]\s*/, '');
+            const formatted = cleaned
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+            return `<li>${formatted}</li>`;
+        }).join('');
+        
+        return `<ul>${items}</ul>`;
+    }
+}
 
 function convertToMarkdown(html) {
+    console.log('convertToMarkdown called with HTML:', html);
+    
     // Create temp element
     const temp = document.createElement('div');
     temp.innerHTML = html;
@@ -221,37 +243,95 @@ function convertToMarkdown(html) {
     // Get list items
     const listItems = temp.querySelectorAll('li');
     if (listItems.length > 0) {
-        return Array.from(listItems).map(li => {
+        console.log('Found', listItems.length, 'list items');
+        const result = Array.from(listItems).map(li => {
+            console.log('Processing li innerHTML:', li.innerHTML);
             let text = li.innerHTML
                 .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
                 .replace(/<em>(.*?)<\/em>/g, '*$1*')
                 .replace(/<[^>]*>/g, '');
+            console.log('Processed li text:', text);
             return `• ${text.trim()}`;
         }).join('\n');
+        console.log('Final list result:', result);
+        return result;
     }
     
     // Handle paragraphs
     const paragraphs = temp.querySelectorAll('p');
     if (paragraphs.length > 0) {
-        return Array.from(paragraphs).map(p => {
-            return p.innerHTML
+        console.log('Found', paragraphs.length, 'paragraphs');
+        const result = Array.from(paragraphs).map(p => {
+            console.log('Processing p innerHTML:', p.innerHTML);
+            const processed = p.innerHTML
                 .replace(/<strong>(.*?)<\/strong>/g, '**$1**')
                 .replace(/<em>(.*?)<\/em>/g, '*$1*')
                 .replace(/<[^>]*>/g, '');
+            console.log('Processed p text:', processed);
+            return processed;
         }).join('\n');
+        console.log('Final paragraph result:', result);
+        return result;
     }
     
     // Fallback
+    console.log('Fallback to textContent');
     return temp.textContent || '';
+}
+function convertMarkdownToHTML(text) {
+    console.log('convertMarkdownToHTML called with:', text); // Debug
+    
+    if (!text || text.trim() === '') return '';
+    
+    // Simple test - if we see **test** anywhere, make it bold
+    if (text.includes('**')) {
+        console.log('Found ** in text, processing...'); // Debug
+    }
+    
+    const lines = text.split('\n')
+        .map(line => line.trim())
+        .filter(line => line);
+    
+    if (lines.length === 0) return '';
+    
+    if (lines.length === 1) {
+        // Single line - just format it as a paragraph
+        const formatted = lines[0]
+            .replace(/^[•\-\*]\s*/, '')
+            .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+            .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+            .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+        console.log('Single line formatted:', formatted); // Debug
+        return `<p>${formatted}</p>`;
+    } else {
+        // Multiple lines - create list
+        const items = lines.map(line => {
+            const cleaned = line.replace(/^[•\-\*]\s*/, '');
+            const formatted = cleaned
+                .replace(/\*\*([^*]+)\*\*/g, '<strong>$1</strong>')
+                .replace(/\*([^*]+)\*/g, '<em>$1</em>')
+                .replace(/(https?:\/\/[^\s]+)/g, '<a href="$1" target="_blank" rel="noopener">$1</a>');
+            return `<li>${formatted}</li>`;
+        }).join('');
+        
+        const result = `<ul>${items}</ul>`;
+        console.log('Multi-line formatted:', result); // Debug
+        return result;
+    }
 }
 
 function formatContentForDisplay(element) {
-    const content = element.textContent || element.innerHTML || '';
+    const content = element.textContent || '';
     if (!content.trim()) return;
     
-    // Parse raw content (which may have markdown) into HTML
-    const formatted = convertToRichText(content);
-    if (formatted !== content) {
+    console.log('Raw content from element:', content); // Debug log
+    
+    // Convert markdown-style formatting to HTML for display
+    const formatted = convertMarkdownToHTML(content);
+    console.log('Formatted HTML result:', formatted); // Debug log
+    
+    if (formatted && formatted !== content) {
         element.innerHTML = formatted;
+        console.log('Updated element HTML'); // Debug log
     }
 }

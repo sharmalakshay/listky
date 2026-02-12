@@ -7,7 +7,7 @@
 <meta property="og:description" content="A list by {{ username }} on listky.top">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://listky.top/{{ username }}/{{ list.slug }}">
-<script src="{{ url_for('static', path='/clean-editor.js') }}" defer></script>
+<script src="{{ url_for('static', path='/clean-editor.js') }}"></script>
 {% endblock %}
 
 {% block content %}
@@ -32,7 +32,7 @@
 {% endif %}
 
 <div class="content">
-    <div class="list-content">{{ formatted_content|safe }}</div>
+    <div class="list-content">{{ formatted_content }}</div>
 </div>
 
 <div class="back">
