@@ -681,22 +681,37 @@ ul {
     font-style: italic;
 }
 
-/* List content rendering - no double bullets */
+/* List content rendering - clean display without conflicts */
 .list-content {
     line-height: 1.8;
 }
 
-.list-content .formatted-list {
+.list-content ul {
     list-style: none !important;
     padding: 0 !important;
-    margin: 0;
+    margin: 1rem 0;
 }
 
-.list-content .formatted-list li {
+.list-content li {
     background: var(--white);
     padding: var(--spacing-md);
     margin: var(--spacing-sm) 0;
     border-radius: var(--radius-md);
     box-shadow: var(--shadow-sm);
     border-left: 3px solid var(--primary-blue);
+}
+
+.list-content strong {
+    font-weight: 600;
+    color: var(--primary-blue);
+}
+
+.list-content em {
+    font-style: italic;
+    color: var(--secondary-gray);
+}
+
+.list-content a {
+    color: var(--primary-blue);
+    text-decoration: underline;
 }

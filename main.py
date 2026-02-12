@@ -233,14 +233,12 @@ async def view_list(username: str, slug: str, request: Request, db = Depends(get
     if list_data["is_public"]:
         record_list_view(username, slug, request, db)
     
-    # Format content with clickable links
-    formatted_content = make_links(list_data["content"].replace('\n', '<br>'))
-    
+    # Don't double-process the content - let the JavaScript handle formatting
     context = {
         "request": request,
         "list": list_data,
         "username": username,
-        "formatted_content": formatted_content,
+        "formatted_content": list_data["content"],  # Use raw content, let JS format it
         "current_user": current_user
     }
     
