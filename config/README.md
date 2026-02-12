@@ -1,12 +1,22 @@
 # Configuration Files
 
-This directory contains configuration files for different deployment scenarios.
+This directory contains Docker and deployment configuration files for different scenarios.
 
 ## Files
 
 - `Dockerfile` - Docker container configuration for the core platform
 - `docker-compose.yaml` - Container orchestration for self-hosting
-- `.env.example` - Environment variables template
+- `README.md` - This deployment guide
+
+## Environment Configuration
+
+**Important:** The `.env` file should be created in the **root directory** (one level up), not in this config/ directory.
+
+```bash
+# From project root directory:
+cp .env.example .env
+# Edit .env with your settings
+```
 
 ## Deployment Scenarios
 
@@ -38,7 +48,7 @@ Premium features include:
 For local development:
 
 ```bash
-# Copy and edit environment file
+# From project root directory (one level up from config/):
 cp .env.example .env
 # Edit .env with your settings
 
@@ -46,8 +56,7 @@ cp .env.example .env
 docker compose up -d --build
 
 # Or run locally with Python
-pip install -r ../requirements.txt
-cd ..
+pip install -r requirements.txt
 uvicorn main:app --reload
 ```
 
