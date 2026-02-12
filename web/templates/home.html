@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>listky.top</h1>
+<p class="tagline"><strong>One word. One PIN. Zero bullshit.</strong></p>
+<p>The dumbest, most private, minimalist list-sharing platform on the internet.</p>
+
+{% if welcome_message %}
+<p class="welcome">{{ welcome_message }}</p>
+{% endif %}
+
+<div class="actions">
+    {% if current_user %}
+        <a href="/{{ current_user }}">👤 My Profile</a>
+        <a href="/{{ current_user }}/create">📝 Create List</a>
+        <a href="/{{ current_user }}/manage">⚙️ Manage Lists</a>
+        <a href="/logout">🚪 Log Out</a>
+    {% else %}
+        <p><strong>Ready to join?</strong></p>
+        <a href="/signup">Sign Up</a>
+        <a href="/login">Log In</a>
+    {% endif %}
+</div>
+
+{% if trending_lists %}
+<h2>Trending Lists (last 7 days)</h2>
+<ul>
+    {% for list in trending_lists %}
+    <li>
+        <a href="/{{ list.username }}/{{ list.slug }}">{{ list.title }}</a> 
+        by <a href="/{{ list.username }}">{{ list.username }}</a> 
+        ({{ list.views }} views)
+    </li>
+    {% endfor %}
+</ul>
+{% endif %}
+{% endblock %}

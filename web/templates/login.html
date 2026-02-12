@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}Log In - listky.top{% endblock %}
+
+{% block content %}
+<h1>Log In</h1>
+
+{% if signup_success %}
+<p class="welcome">Account created successfully! You can now log in.</p>
+{% endif %}
+
+<form method="post" action="/login">
+    <div class="form-group">
+        <label for="username">Username</label>
+        <input type="text" id="username" name="username" required 
+               autocomplete="username"
+               placeholder="yourname">
+    </div>
+    
+    <div class="form-group">
+        <label for="pin">PIN</label>
+        <input type="password" id="pin" name="pin" required 
+               pattern="\d{6}" 
+               maxlength="6"
+               autocomplete="current-password"
+               placeholder="123456">
+        <small>Your 6-digit PIN. Wrong PIN 4+ times = temporary lockout.</small>
+    </div>
+    
+    <button type="submit">Log In</button>
+</form>
+
+<p style="margin-top: 2rem;">
+    <a href="/">← Back to Home</a> | <a href="/signup">Need an account?</a>
+</p>
+{% endblock %}

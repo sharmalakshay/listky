@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+
+{% block title %}Sign Up - listky.top{% endblock %}
+
+{% block content %}
+<h1>Sign Up</h1>
+<p>Choose your username carefully - it's yours forever (first-come-first-served).<br>
+Your PIN is your only key. <strong>No recovery, no email, no mercy.</strong></p>
+
+<form method="post" action="/signup">
+    <div class="form-group">
+        <label for="username">Username (3-20 alphanumeric chars)</label>
+        <input type="text" id="username" name="username" required 
+               pattern="[a-zA-Z0-9]{3,20}" 
+               placeholder="yourname" 
+               autocomplete="username">
+        <small>Letters and numbers only. Choose wisely - this is permanent.</small>
+    </div>
+    
+    <div class="form-group">
+        <label for="pin">6-Digit PIN</label>
+        <input type="password" id="pin" name="pin" required 
+               pattern="\d{6}" 
+               placeholder="123456" 
+               maxlength="6" autocomplete="new-password">
+        <small>Exactly 6 digits. <strong>WRITE THIS DOWN</strong> - there's no password reset.</small>
+    </div>
+    
+    <div class="form-group">
+        <label for="pin_confirm">Confirm PIN</label>
+        <input type="password" id="pin_confirm" name="pin_confirm" required 
+               pattern="\d{6}" 
+               placeholder="123456" 
+               maxlength="6" autocomplete="new-password">
+    </div>
+    
+    <button type="submit">Create Account</button>
+</form>
+
+<p style="margin-top: 2rem;">
+    <a href="/">← Back to Home</a>
+</p>
+{% endblock %}
