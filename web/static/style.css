@@ -252,11 +252,7 @@ small {
 
 /* Content Areas */
 .content {
-    background: var(--light-gray);
-    padding: var(--spacing-xl);
-    border-radius: var(--radius-lg);
     margin: var(--spacing-xl) 0;
-    border-left: 4px solid var(--primary-blue);
 }
 
 .meta {
