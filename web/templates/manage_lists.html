@@ -1,0 +1,55 @@
+{% extends "base.html" %}
+
+{% block title %}Manage Lists - {{ username }} - listky.top{% endblock %}
+
+{% block content %}
+<h1>Manage My Lists</h1>
+
+<div class="actions">
+    <a href="/{{ username }}/create">📝 Create New List</a>
+</div>
+
+{% if lists %}
+<div class="content">
+    {% for list in lists %}
+    <div style="border: 1px solid #ddd; border-radius: 4px; padding: 1rem; margin: 1rem 0;">
+        <h3>
+            <a href="/{{ username }}/{{ list.slug }}" style="color: #007acc; text-decoration: none;">
+                {{ list.title }}
+            </a>
+            {% if list.is_public %}
+                <span style="background: #28a745; color: white; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.8rem; margin-left: 0.5rem;">PUBLIC</span>
+            {% else %}
+                <span style="background: #6c757d; color: white; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.8rem; margin-left: 0.5rem;">PRIVATE</span>
+            {% endif %}
+        </h3>
+        
+        <p style="color: #666; margin: 0.5rem 0;">
+            Created {{ list.created_at[:10] }} • Updated {{ list.updated_at[:10] }}
+        </p>
+        
+        <p style="color: #666; font-size: 0.9rem; margin: 0.5rem 0;">
+            URL: /{{ username }}/{{ list.slug }}
+        </p>
+        
+        <div style="margin-top: 1rem;">
+            <a href="/{{ username }}/{{ list.slug }}" style="color: #007acc; text-decoration: none;">👁️ View</a> | 
+            <a href="/{{ username }}/{{ list.slug }}/edit" style="color: #007acc; text-decoration: none;">✏️ Edit</a> | 
+            <a href="/{{ username }}/{{ list.slug }}/delete" style="color: #dc3545; text-decoration: none;" 
+               onclick="return confirm('Are you sure? This cannot be undone!')">🗑️ Delete</a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% else %}
+<div class="content">
+    <p>You haven't created any lists yet.</p>
+    <p><a href="/{{ username }}/create">📝 Create your first list</a></p>
+</div>
+{% endif %}
+
+<div class="back">
+    <a href="/{{ username }}">← My Profile</a> | 
+    <a href="/">← Home</a>
+</div>
+{% endblock %}

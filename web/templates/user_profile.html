@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}{{ username }} - listky.top{% endblock %}
+
+{% block content %}
+<h1>{{ username }}'s Lists</h1>
+<div class="meta">
+    Member since {{ user_info.created_at[:10] if user_info.created_at else 'unknown' }}
+</div>
+
+{% if current_user == username %}
+<div class="actions">
+    <a href="/{{ username }}/create">📝 Create New List</a>
+    <a href="/{{ username }}/manage">⚙️ Manage My Lists</a>
+</div>
+{% endif %}
+
+{% if lists %}
+<div class="content">
+    <h2>Public Lists</h2>
+    <ul>
+        {% for list in lists %}
+        <li>
+            <a href="/{{ username }}/{{ list.slug }}">{{ list.title }}</a>
+            <small>• Updated {{ list.updated_at[:10] }}</small>
+        </li>
+        {% endfor %}
+    </ul>
+</div>
+{% else %}
+    {% if current_user == username %}
+    <div class="content">
+        <p>You haven't created any public lists yet.</p>
+        <p><a href="/{{ username }}/create">📝 Create your first list</a></p>
+    </div>
+    {% else %}
+    <div class="content">
+        <p>{{ username }} hasn't created any public lists yet.</p>
+    </div>
+    {% endif %}
+{% endif %}
+
+<div class="back">
+    <a href="/">← Back to Home</a>
+</div>
+{% endblock %}

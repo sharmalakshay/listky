@@ -72,7 +72,6 @@ async def signup(request: Request, username: str = Form(...), pin: str = Form(..
         return RedirectResponse(url="/login?signup=success", status_code=303)
         
     except (ListkyError, UserAlreadyExistsError) as e:
-        # In a real implementation, you'd pass the error to the template
         return templates.TemplateResponse("signup.html", {
             "request": request,
             "error": str(e)
@@ -148,18 +147,61 @@ async def user_profile(username: str, request: Request, db = Depends(get_db)):
         "current_user": get_session_user(request)
     }
     
-    # For now, return a simple response (we'd create a user_profile.html template)
-    return f"""
-    <html>
-        <head><title>{username} - listky.top</title></head>
-        <body>
-            <h1>{username}'s Lists</h1>
-            <ul>
-                {''.join([f'<li><a href="/{username}/{list_item["slug"]}">{list_item["title"]}</a></li>' for list_item in public_lists])}
-            </ul>
-        </body>
-    </html>
-    """
+    return templates.TemplateResponse("user_profile.html", context)
+
+@app.get("/{username}/create", response_class=HTMLResponse)
+async def create_list_form(username: str, request: Request):
+    current_user = get_session_user(request)
+    if not current_user or current_user.lower() != username.lower():
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    context = {
+        "request": request,
+        "username": username
+    }
+    return templates.TemplateResponse("create_list.html", context)
+
+@app.post("/{username}/create")
+async def create_list_handler(username: str, request: Request, 
+                            title: str = Form(...), slug: str = Form(...), 
+                            content: str = Form(...), is_public: bool = Form(False), 
+                            db = Depends(get_db)):
+    current_user = get_session_user(request)
+    if not current_user or current_user.lower() != username.lower():
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    try:
+        result = create_list(username, slug, title, content, is_public, db)
+        return RedirectResponse(url=f"/{username}/{slug}", status_code=303)
+        
+    except ListkyError as e:
+        context = {
+            "request": request,
+            "username": username,
+            "error": str(e),
+            "title": title,
+            "slug": slug,
+            "content": content,
+            "is_public": is_public
+        }
+        return templates.TemplateResponse("create_list.html", context)
+
+@app.get("/{username}/manage", response_class=HTMLResponse)
+async def manage_lists(username: str, request: Request, db = Depends(get_db)):
+    current_user = get_session_user(request)
+    if not current_user or current_user.lower() != username.lower():
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    # Get all lists (including private ones)
+    lists = get_user_lists(username, include_private=True, db=db)
+    
+    context = {
+        "request": request,
+        "username": username,
+        "lists": lists,
+        "current_user": current_user
+    }
+    return templates.TemplateResponse("manage_lists.html", context)
 
 @app.get("/{username}/{slug}", response_class=HTMLResponse)
 async def view_list(username: str, slug: str, request: Request, db = Depends(get_db)):
@@ -172,41 +214,128 @@ async def view_list(username: str, slug: str, request: Request, db = Depends(get
     if not list_data:
         raise HTTPException(status_code=404, detail="List not found")
     
-    # Check if list is public
-    if not list_data["is_public"]:
+    current_user = get_session_user(request)
+    
+    # Check if list is private and user doesn't have access
+    if not list_data["is_public"] and current_user != username:
         return HTMLResponse(content="""
         <html>
-            <body>
+            <head><title>Private List - listky.top</title></head>
+            <body style="font-family: system-ui; padding: 20px; max-width: 600px; margin: 0 auto;">
                 <h1>Private List</h1>
                 <p>This list is private and not publicly accessible.</p>
+                <p><a href="/{username}">← Back to {username}'s profile</a> | <a href="/">← Home</a></p>
             </body>
         </html>
-        """)
+        """.format(username=username))
     
-    # Record view
-    record_list_view(username, slug, request, db)
+    # Record view for public lists only
+    if list_data["is_public"]:
+        record_list_view(username, slug, request, db)
     
     # Format content with clickable links
     formatted_content = make_links(list_data["content"].replace('\n', '<br>'))
     
-    return f"""
+    context = {
+        "request": request,
+        "list": list_data,
+        "username": username,
+        "formatted_content": formatted_content,
+        "current_user": current_user
+    }
+    
+    return templates.TemplateResponse("view_list.html", context)
+
+@app.get("/{username}/{slug}/edit", response_class=HTMLResponse)
+async def edit_list_form(username: str, slug: str, request: Request, db = Depends(get_db)):
+    current_user = get_session_user(request)
+    if not current_user or current_user.lower() != username.lower():
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    list_data = get_list(username, slug, db)
+    if not list_data:
+        raise HTTPException(status_code=404, detail="List not found")
+    
+    context = {
+        "request": request,
+        "username": username,
+        "list": list_data
+    }
+    return templates.TemplateResponse("edit_list.html", context)
+
+@app.post("/{username}/{slug}/update")
+async def update_list_handler(username: str, slug: str, request: Request,
+                            title: str = Form(...), content: str = Form(...),
+                            is_public: bool = Form(False), db = Depends(get_db)):
+    current_user = get_session_user(request)
+    if not current_user or current_user.lower() != username.lower():
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    try:
+        result = update_list(username, slug, title, content, is_public, db)
+        return RedirectResponse(url=f"/{username}/{slug}", status_code=303)
+        
+    except ListkyError as e:
+        list_data = get_list(username, slug, db)
+        context = {
+            "request": request,
+            "username": username,
+            "list": list_data,
+            "error": str(e),
+            "title": title,
+            "content": content,
+            "is_public": is_public
+        }
+        return templates.TemplateResponse("edit_list.html", context)
+
+@app.get("/{username}/{slug}/delete", response_class=HTMLResponse)
+async def delete_list_form(username: str, slug: str, request: Request, db = Depends(get_db)):
+    current_user = get_session_user(request)
+    if not current_user or current_user.lower() != username.lower():
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    list_data = get_list(username, slug, db)
+    if not list_data:
+        raise HTTPException(status_code=404, detail="List not found")
+    
+    return HTMLResponse(content=f"""
     <html>
         <head>
-            <title>{list_data["title"]} by {username} - listky.top</title>
+            <title>Delete List - listky.top</title>
             <meta name="viewport" content="width=device-width, initial-scale=1">
             <style>
-                body {{ font-family: system-ui, -apple-system, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; line-height: 1.6; }}
-                .content {{ background: #f8f9fa; padding: 1.5rem; border-radius: 4px; margin: 2rem 0; border-left: 4px solid #007acc; }}
+                body {{ font-family: system-ui, -apple-system, sans-serif; padding: 20px; max-width: 600px; margin: 0 auto; line-height: 1.5; }}
+                .form-group {{ margin: 1rem 0; }}
+                button {{ background: #dc3545; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer; font-size: 1rem; }}
+                button:hover {{ background: #c82333; }}
+                .back a {{ color: #007acc; text-decoration: none; }}
             </style>
         </head>
         <body>
-            <h1>{list_data["title"]}</h1>
-            <p>By <a href="/{username}">{username}</a> • Created {list_data["created_at"][:10]}</p>
-            <div class="content">{formatted_content}</div>
-            <p><a href="/{username}">← More lists by {username}</a> | <a href="/">← Home</a></p>
+            <h1>Delete List</h1>
+            <p>Are you sure you want to delete "<strong>{list_data['title']}</strong>"?</p>
+            <p><strong>This action cannot be undone.</strong></p>
+            
+            <form method="post" action="/{username}/{slug}/delete">
+                <button type="submit">🗑️ Yes, Delete This List</button>
+            </form>
+            
+            <p style="margin-top: 2rem;" class="back">
+                <a href="/{username}/{slug}">← Cancel and Go Back</a>
+            </p>
         </body>
     </html>
-    """
+    """)
 
-# Additional endpoints would be implemented similarly...
-# For now, this shows the pattern of using the core modules
+@app.post("/{username}/{slug}/delete")
+async def delete_list_handler(username: str, slug: str, request: Request, db = Depends(get_db)):
+    current_user = get_session_user(request)
+    if not current_user or current_user.lower() != username.lower():
+        raise HTTPException(status_code=403, detail="Access denied")
+    
+    try:
+        result = delete_list(username, slug, db)
+        return RedirectResponse(url=f"/{username}/manage", status_code=303)
+        
+    except ListNotFoundError:
+        raise HTTPException(status_code=404, detail="List not found")

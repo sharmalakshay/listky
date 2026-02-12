@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+
+{% block title %}{{ list.title }} by {{ username }} - listky.top{% endblock %}
+
+{% block extra_head %}
+<meta property="og:title" content="{{ list.title }}">
+<meta property="og:description" content="A list by {{ username }} on listky.top">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://listky.top/{{ username }}/{{ list.slug }}">
+{% endblock %}
+
+{% block content %}
+<h1>{{ list.title }}</h1>
+<div class="meta">
+    By <a href="/{{ username }}">{{ username }}</a> • 
+    Created {{ list.created_at[:10] }} • 
+    Updated {{ list.updated_at[:10] }}
+    
+    {% if current_user == username %}
+    <span style="margin-left: 1rem;">
+        <a href="/{{ username }}/{{ list.slug }}/edit">✏️ Edit</a> | 
+        <a href="/{{ username }}/{{ list.slug }}/delete" style="color: #dc3545;" 
+           onclick="return confirm('Are you sure? This cannot be undone!')">🗑️ Delete</a>
+    </span>
+    {% endif %}
+</div>
+
+<div class="content">
+    {{ formatted_content | safe }}
+</div>
+
+<div class="back">
+    <a href="/{{ username }}">← More lists by {{ username }}</a> | 
+    <a href="/">← Home</a>
+</div>
+{% endblock %}
