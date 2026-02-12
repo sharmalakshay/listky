@@ -3,53 +3,99 @@
 {% block title %}Edit - {{ list.title }} - listky.top{% endblock %}
 
 {% block content %}
-<h1>Edit List</h1>
+<div class="container">
+    <div class="card">
+        <h1 class="heading-xl">Edit List ✏️</h1>
 
-{% if error %}
-<div style="background: #ffeaa7; color: #d63031; padding: 1rem; border-radius: 4px; margin: 1rem 0;">
-    {{ error }}
+        {% if error %}
+        <div class="alert alert-error">
+            {{ error }}
+        </div>
+        {% endif %}
+
+        <form method="post" action="/{{ username }}/{{ list.slug }}/update" id="edit-list-form">
+            <div class="form-group">
+                <label for="title" class="form-label">List Title</label>
+                <input type="text" id="title" name="title" required 
+                       maxlength="200" 
+                       placeholder="My Awesome List"
+                       value="{{ title or list.title }}"
+                       class="form-input">
+                <small class="form-help">1-200 characters</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">URL Slug</label>
+                <input type="text" value="{{ list.slug }}" disabled class="form-input form-input-disabled">
+                <small class="form-help">URL slug cannot be changed after creation</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="form-label">List Items</label>
+                <div id="list-editor" class="list-editor">
+                    <div class="editor-toolbar">
+                        <button type="button" class="toolbar-btn" onclick="formatText('bold')" title="Bold">
+                            <strong>B</strong>
+                        </button>
+                        <button type="button" class="toolbar-btn" onclick="formatText('italic')" title="Italic">
+                            <em>I</em>
+                        </button>
+                        <div class="toolbar-divider"></div>
+                        <select id="text-color" class="toolbar-select" onchange="changeTextColor(this.value)">
+                            <option value="#333">Default</option>
+                            <option value="#e74c3c" style="color: #e74c3c;">Red</option>
+                            <option value="#3498db" style="color: #3498db;">Blue</option>
+                            <option value="#27ae60" style="color: #27ae60;">Green</option>
+                            <option value="#f39c12" style="color: #f39c12;">Orange</option>
+                            <option value="#9b59b6" style="color: #9b59b6;">Purple</option>
+                        </select>
+                        <div class="toolbar-divider"></div>
+                        <button type="button" class="toolbar-btn" onclick="addListItem()" title="Add Item">
+                            ➕ Add Item
+                        </button>
+                    </div>
+                    
+                    <div id="list-items" class="list-items">
+                        <!-- Items will be loaded here -->
+                    </div>
+                    
+                    <textarea id="content" name="content" required style="display: none;">{{ content or list.content }}</textarea>
+                </div>
+                <small class="form-help">Drag items to reorder. Use the toolbar for formatting. URLs will automatically become clickable links.</small>
+            </div>
+            
+            <div class="form-group">
+                <label class="checkbox-label">
+                    <input type="checkbox" name="is_public" id="is_public" 
+                           {% if (is_public is not none and is_public) or (is_public is none and list.is_public) %}checked{% endif %}
+                           class="checkbox">
+                    <div class="checkbox-indicator"></div>
+                    Make this list public
+                </label>
+                <small class="form-help">Public lists can be viewed by anyone and may appear in trending. Private lists are only accessible to you.</small>
+            </div>
+            
+            <button type="submit" class="btn btn-primary">Update List ✨</button>
+        </form>
+
+        <div class="back-links">
+            <a href="/{{ username }}/{{ list.slug }}" class="back-link">← View List</a>
+            <a href="/{{ username }}" class="back-link">← My Profile</a>
+        </div>
+    </div>
 </div>
-{% endif %}
 
-<form method="post" action="/{{ username }}/{{ list.slug }}/update">
-    <div class="form-group">
-        <label for="title">List Title</label>
-        <input type="text" id="title" name="title" required 
-               maxlength="200" 
-               placeholder="My Awesome List"
-               value="{{ title or list.title }}">
-        <small>1-200 characters</small>
-    </div>
+<script src="/static/list-editor.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialize the list editor with existing content
+    const existingContent = document.getElementById('content').value;
+    loadExistingContent(existingContent);
     
-    <div class="form-group">
-        <label>URL Slug</label>
-        <input type="text" value="{{ list.slug }}" disabled>
-        <small>URL slug cannot be changed after creation</small>
-    </div>
-    
-    <div class="form-group">
-        <label for="content">List Content</label>
-        <textarea id="content" name="content" required 
-                  rows="10" 
-                  maxlength="10000"
-                  placeholder="• Item 1&#10;• Item 2&#10;• Check out https://example.com&#10;• Item 4">{{ content or list.content }}</textarea>
-        <small>1-10,000 characters. URLs will automatically become clickable links.</small>
-    </div>
-    
-    <div class="form-group">
-        <label>
-            <input type="checkbox" name="is_public" id="is_public" 
-                   {% if (is_public is not none and is_public) or (is_public is none and list.is_public) %}checked{% endif %}>
-            Make this list public
-        </label>
-        <small>Public lists can be viewed by anyone and may appear in trending. Private lists are only accessible to you.</small>
-    </div>
-    
-    <button type="submit">Update List</button>
-</form>
-
-<div class="back">
-    <a href="/{{ username }}/{{ list.slug }}">← View List</a> | 
-    <a href="/{{ username }}">← My Profile</a>
-</div>
+    // Update hidden textarea when form is submitted
+    document.getElementById('edit-list-form').addEventListener('submit', function() {
+        syncListToTextarea();
+    });
+});
+</script>
 {% endblock %}

@@ -10,31 +10,38 @@
 
 {% if current_user == username %}
 <div class="actions">
-    <a href="/{{ username }}/create">📝 Create New List</a>
-    <a href="/{{ username }}/manage">⚙️ Manage My Lists</a>
+    <a href="/{{ username }}/create" class="btn">📝 Create New List</a>
+    <a href="/{{ username }}/manage" class="btn btn-secondary">⚙️ Manage My Lists</a>
 </div>
 {% endif %}
 
 {% if lists %}
 <div class="content">
-    <h2>Public Lists</h2>
-    <ul>
-        {% for list in lists %}
-        <li>
-            <a href="/{{ username }}/{{ list.slug }}">{{ list.title }}</a>
-            <small>• Updated {{ list.updated_at[:10] }}</small>
-        </li>
-        {% endfor %}
-    </ul>
+    <h2>{% if current_user == username %}My Public Lists{% else %}Public Lists{% endif %}</h2>
+    {% for list in lists %}
+    <div class="list-item">
+        <h3><a href="/{{ username }}/{{ list.slug }}">{{ list.title }}</a></h3>
+        <div class="meta">
+            Updated {{ list.updated_at[:10] }}
+            {% if list.is_public %}
+                <span class="status-badge status-public">PUBLIC</span>
+            {% endif %}
+        </div>
+    </div>
+    {% endfor %}
 </div>
 {% else %}
     {% if current_user == username %}
     <div class="content">
-        <p>You haven't created any public lists yet.</p>
-        <p><a href="/{{ username }}/create">📝 Create your first list</a></p>
+        <h2>No Public Lists Yet</h2>
+        <p>You haven't created any public lists yet. Ready to share something with the world?</p>
+        <div class="actions">
+            <a href="/{{ username }}/create" class="btn">📝 Create your first public list</a>
+        </div>
     </div>
     {% else %}
     <div class="content">
+        <h2>No Public Lists</h2>
         <p>{{ username }} hasn't created any public lists yet.</p>
     </div>
     {% endif %}

@@ -7,6 +7,7 @@
 <meta property="og:description" content="A list by {{ username }} on listky.top">
 <meta property="og:type" content="article">
 <meta property="og:url" content="https://listky.top/{{ username }}/{{ list.slug }}">
+<script src="{{ url_for('static', path='/list-editor.js') }}" defer></script>
 {% endblock %}
 
 {% block content %}
@@ -15,18 +16,23 @@
     By <a href="/{{ username }}">{{ username }}</a> • 
     Created {{ list.created_at[:10] }} • 
     Updated {{ list.updated_at[:10] }}
-    
-    {% if current_user == username %}
-    <span style="margin-left: 1rem;">
-        <a href="/{{ username }}/{{ list.slug }}/edit">✏️ Edit</a> | 
-        <a href="/{{ username }}/{{ list.slug }}/delete" style="color: #dc3545;" 
-           onclick="return confirm('Are you sure? This cannot be undone!')">🗑️ Delete</a>
-    </span>
+    {% if list.is_public %}
+        <span class="status-badge status-public">PUBLIC</span>
+    {% else %}
+        <span class="status-badge status-private">PRIVATE</span>
     {% endif %}
 </div>
 
+{% if current_user == username %}
+<div class="actions">
+    <a href="/{{ username }}/{{ list.slug }}/edit" class="btn btn-secondary">✏️ Edit List</a>
+    <a href="/{{ username }}/{{ list.slug }}/delete" class="btn btn-danger" 
+       onclick="return confirm('Are you sure? This cannot be undone!')">🗑️ Delete List</a>
+</div>
+{% endif %}
+
 <div class="content">
-    {{ formatted_content | safe }}
+    <div class="list-content">{{ list.content }}</div>
 </div>
 
 <div class="back">

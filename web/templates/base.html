@@ -1,86 +1,31 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
+    <meta charset="UTF-8">
     <title>{% block title %}listky.top{% endblock %}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <style>
-        body { 
-            font-family: system-ui, -apple-system, sans-serif; 
-            padding: 20px; 
-            max-width: 700px; 
-            margin: 0 auto; 
-            line-height: 1.5; 
-        }
-        h1 { margin-bottom: 0.5rem; }
-        .tagline { color: #666; margin-bottom: 2rem; }
-        .welcome { 
-            background: #e8f4fd; 
-            padding: 1rem; 
-            border-radius: 4px; 
-            margin: 1rem 0; 
-            border-left: 4px solid #007acc; 
-            color: #0066aa; 
-        }
-        .actions { margin: 2rem 0; }
-        .actions a { 
-            display: inline-block; 
-            margin-right: 1rem; 
-            margin-bottom: 0.5rem; 
-            padding: 0.5rem 1rem; 
-            background: #007acc; 
-            color: white; 
-            text-decoration: none; 
-            border-radius: 4px; 
-        }
-        .actions a:hover { background: #005c99; }
-        ul { padding-left: 1.2rem; }
-        li { margin: 0.5rem 0; }
-        .footer { 
-            margin-top: 3rem; 
-            padding-top: 2rem; 
-            border-top: 1px solid #eee; 
-            color: #666; 
-            font-size: 0.9rem; 
-        }
-        .content { 
-            background: #f8f9fa; 
-            padding: 1.5rem; 
-            border-radius: 4px; 
-            margin: 2rem 0; 
-            border-left: 4px solid #007acc; 
-        }
-        .form-group { margin: 1rem 0; }
-        label { display: block; margin-bottom: 0.5rem; font-weight: 500; }
-        input, textarea { 
-            width: 100%; 
-            padding: 0.75rem; 
-            border: 1px solid #ddd; 
-            border-radius: 4px; 
-            font-size: 1rem; 
-        }
-        button { 
-            background: #007acc; 
-            color: white; 
-            border: none; 
-            padding: 0.75rem 1.5rem; 
-            border-radius: 4px; 
-            cursor: pointer; 
-            font-size: 1rem; 
-        }
-        button:hover { background: #005c99; }
-        .meta { color: #666; margin-bottom: 2rem; }
-        .back { margin-top: 2rem; }
-        .back a { color: #007acc; text-decoration: none; }
-        a { color: #007acc; }
-    </style>
+    <meta name="description" content="One word. One PIN. Zero bullshit. The most private, minimalist list-sharing platform on the internet.">
+    
+    <!-- Styles -->
+    <link rel="stylesheet" href="{{ url_for('static', path='/style.css') }}">
+    
+    <!-- Favicon -->
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📝</text></svg>">
+    
     {% block extra_head %}{% endblock %}
 </head>
 <body>
-    {% block content %}{% endblock %}
-    
-    <div class="footer">
-        <p>No forced profiles, no surveillance tracking, no algorithmic manipulation, no data harvesting, no bullshit.</p>
-        <p><a href="https://github.com/sharmalakshay/listky" target="_blank">Source Code</a> | AGPL-3.0 Licensed</p>
+    <div class="container">
+        <div class="content-wrapper fade-in">
+            {% block content %}{% endblock %}
+            
+            <div class="footer">
+                <p>No forced profiles, no surveillance tracking, no algorithmic manipulation, no data harvesting, no bullshit.</p>
+                <p><a href="https://github.com/sharmalakshay/listky" target="_blank">Source Code</a> | AGPL-3.0 Licensed</p>
+            </div>
+        </div>
     </div>
+    
+    {% block scripts %}{% endblock %}
 </body>
 </html>

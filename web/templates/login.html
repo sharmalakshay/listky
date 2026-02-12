@@ -6,7 +6,13 @@
 <h1>Log In</h1>
 
 {% if signup_success %}
-<p class="welcome">Account created successfully! You can now log in.</p>
+<div class="alert alert-success">
+    🎉 Account created successfully! You can now log in.
+</div>
+{% endif %}
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
 {% endif %}
 
 <form method="post" action="/login">
@@ -14,7 +20,8 @@
         <label for="username">Username</label>
         <input type="text" id="username" name="username" required 
                autocomplete="username"
-               placeholder="yourname">
+               placeholder="yourname"
+               value="{{ username or '' }}">
     </div>
     
     <div class="form-group">
@@ -27,10 +34,13 @@
         <small>Your 6-digit PIN. Wrong PIN 4+ times = temporary lockout.</small>
     </div>
     
-    <button type="submit">Log In</button>
+    <div class="actions">
+        <button type="submit" class="btn">🚪 Log In</button>
+        <a href="/" class="btn btn-secondary">Cancel</a>
+    </div>
 </form>
 
-<p style="margin-top: 2rem;">
+<div class="back">
     <a href="/">← Back to Home</a> | <a href="/signup">Need an account?</a>
-</p>
+</div>
 {% endblock %}

@@ -6,36 +6,33 @@
 <h1>Manage My Lists</h1>
 
 <div class="actions">
-    <a href="/{{ username }}/create">📝 Create New List</a>
+    <a href="/{{ username }}/create" class="btn">📝 Create New List</a>
+    <a href="/{{ username }}" class="btn btn-secondary">View My Profile</a>
 </div>
 
 {% if lists %}
 <div class="content">
     {% for list in lists %}
-    <div style="border: 1px solid #ddd; border-radius: 4px; padding: 1rem; margin: 1rem 0;">
+    <div class="list-item">
         <h3>
-            <a href="/{{ username }}/{{ list.slug }}" style="color: #007acc; text-decoration: none;">
-                {{ list.title }}
-            </a>
+            <a href="/{{ username }}/{{ list.slug }}">{{ list.title }}</a>
             {% if list.is_public %}
-                <span style="background: #28a745; color: white; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.8rem; margin-left: 0.5rem;">PUBLIC</span>
+                <span class="status-badge status-public">PUBLIC</span>
             {% else %}
-                <span style="background: #6c757d; color: white; padding: 0.2rem 0.5rem; border-radius: 3px; font-size: 0.8rem; margin-left: 0.5rem;">PRIVATE</span>
+                <span class="status-badge status-private">PRIVATE</span>
             {% endif %}
         </h3>
         
-        <p style="color: #666; margin: 0.5rem 0;">
+        <div class="meta">
             Created {{ list.created_at[:10] }} • Updated {{ list.updated_at[:10] }}
-        </p>
+            <br>
+            <strong>URL:</strong> /{{ username }}/{{ list.slug }}
+        </div>
         
-        <p style="color: #666; font-size: 0.9rem; margin: 0.5rem 0;">
-            URL: /{{ username }}/{{ list.slug }}
-        </p>
-        
-        <div style="margin-top: 1rem;">
-            <a href="/{{ username }}/{{ list.slug }}" style="color: #007acc; text-decoration: none;">👁️ View</a> | 
-            <a href="/{{ username }}/{{ list.slug }}/edit" style="color: #007acc; text-decoration: none;">✏️ Edit</a> | 
-            <a href="/{{ username }}/{{ list.slug }}/delete" style="color: #dc3545; text-decoration: none;" 
+        <div class="actions">
+            <a href="/{{ username }}/{{ list.slug }}" class="btn btn-secondary">👁️ View</a>
+            <a href="/{{ username }}/{{ list.slug }}/edit" class="btn btn-secondary">✏️ Edit</a>
+            <a href="/{{ username }}/{{ list.slug }}/delete" class="btn btn-danger" 
                onclick="return confirm('Are you sure? This cannot be undone!')">🗑️ Delete</a>
         </div>
     </div>
@@ -43,10 +40,18 @@
 </div>
 {% else %}
 <div class="content">
-    <p>You haven't created any lists yet.</p>
-    <p><a href="/{{ username }}/create">📝 Create your first list</a></p>
+    <h2>No Lists Yet</h2>
+    <p>You haven't created any lists yet. Ready to get started?</p>
+    <div class="actions">
+        <a href="/{{ username }}/create" class="btn">📝 Create your first list</a>
+    </div>
 </div>
 {% endif %}
+
+<div class="back">
+    <a href="/{{ username }}">← Back to my profile</a>
+</div>
+{% endblock %}
 
 <div class="back">
     <a href="/{{ username }}">← My Profile</a> | 

@@ -6,32 +6,36 @@
 <p>The dumbest, most private, minimalist list-sharing platform on the internet.</p>
 
 {% if welcome_message %}
-<p class="welcome">{{ welcome_message }}</p>
+<div class="welcome">{{ welcome_message }}</div>
 {% endif %}
 
 <div class="actions">
     {% if current_user %}
-        <a href="/{{ current_user }}">👤 My Profile</a>
-        <a href="/{{ current_user }}/create">📝 Create List</a>
-        <a href="/{{ current_user }}/manage">⚙️ Manage Lists</a>
-        <a href="/logout">🚪 Log Out</a>
+        <a href="/{{ current_user }}" class="btn">👤 My Profile</a>
+        <a href="/{{ current_user }}/create" class="btn">📝 Create List</a>
+        <a href="/{{ current_user }}/manage" class="btn">⚙️ Manage Lists</a>
+        <a href="/logout" class="btn btn-secondary">🚪 Log Out</a>
     {% else %}
         <p><strong>Ready to join?</strong></p>
-        <a href="/signup">Sign Up</a>
-        <a href="/login">Log In</a>
+        <a href="/signup" class="btn">Sign Up</a>
+        <a href="/login" class="btn btn-secondary">Log In</a>
     {% endif %}
 </div>
 
 {% if trending_lists %}
-<h2>Trending Lists (last 7 days)</h2>
-<ul>
+<div class="trending">
+    <h2>🔥 Trending Lists (last 7 days)</h2>
     {% for list in trending_lists %}
-    <li>
-        <a href="/{{ list.username }}/{{ list.slug }}">{{ list.title }}</a> 
-        by <a href="/{{ list.username }}">{{ list.username }}</a> 
-        ({{ list.views }} views)
-    </li>
+    <div class="trending-item">
+        <div class="trending-info">
+            <a href="/{{ list.username }}/{{ list.slug }}">{{ list.title }}</a>
+            <div style="font-size: 0.9em; color: var(--secondary-gray);">
+                by <a href="/{{ list.username }}">{{ list.username }}</a>
+            </div>
+        </div>
+        <div class="trending-stats">{{ list.view_count }} views</div>
+    </div>
     {% endfor %}
-</ul>
+</div>
 {% endif %}
 {% endblock %}

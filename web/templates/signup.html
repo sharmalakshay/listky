@@ -4,8 +4,12 @@
 
 {% block content %}
 <h1>Sign Up</h1>
-<p>Choose your username carefully - it's yours forever (first-come-first-served).<br>
+<p class="tagline">Choose your username carefully - it's yours forever (first-come-first-served).<br>
 Your PIN is your only key. <strong>No recovery, no email, no mercy.</strong></p>
+
+{% if error %}
+<div class="alert alert-error">{{ error }}</div>
+{% endif %}
 
 <form method="post" action="/signup">
     <div class="form-group">
@@ -13,7 +17,8 @@ Your PIN is your only key. <strong>No recovery, no email, no mercy.</strong></p>
         <input type="text" id="username" name="username" required 
                pattern="[a-zA-Z0-9]{3,20}" 
                placeholder="yourname" 
-               autocomplete="username">
+               autocomplete="username"
+               value="{{ username or '' }}">
         <small>Letters and numbers only. Choose wisely - this is permanent.</small>
     </div>
     
@@ -32,12 +37,16 @@ Your PIN is your only key. <strong>No recovery, no email, no mercy.</strong></p>
                pattern="\d{6}" 
                placeholder="123456" 
                maxlength="6" autocomplete="new-password">
+        <small>Enter the same 6 digits again to confirm.</small>
     </div>
     
-    <button type="submit">Create Account</button>
+    <div class="actions">
+        <button type="submit" class="btn">🎉 Create Account</button>
+        <a href="/" class="btn btn-secondary">Cancel</a>
+    </div>
 </form>
 
-<p style="margin-top: 2rem;">
+<div class="back">
     <a href="/">← Back to Home</a>
-</p>
+</div>
 {% endblock %}
